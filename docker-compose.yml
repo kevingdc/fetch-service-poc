@@ -1,9 +1,16 @@
 version: "3.8"
 
 services:
-  server:
-    build: ./server
+  mock-api:
+    build: ./mock-api
     volumes:
-      - ./server:/app
+      - ./mock-api:/app
+    ports:
+      - "8000:8000"
+
+  fetch-service:
+    build: ./fetch-service
+    volumes:
+      - ./fetch-service:/app
     ports:
       - "3000:3000"
