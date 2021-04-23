@@ -12,10 +12,14 @@ setQueues([new BullAdapter(influencerQueue)]);
 
 influencerQueue.process(influencerFetchProcess);
 
-function queueInfluencer(pk: ID): boolean {
-  influencerQueue.add({ pk: pk });
+influencerQueue.on("cleaned", (jobs, type) => {
+  console.log(`Cleaned ${jobs.length} ${type} jobs.`);
+});
 
-  return true;
+export function queueInfluencer(pk: ID): void {
+  influencerQueue.add({ pk: pk });
 }
 
-export default queueInfluencer;
+export async function obliterateQueue(): Promise<void> {
+  await influencerQueue.obliterate({ force: true });
+}
