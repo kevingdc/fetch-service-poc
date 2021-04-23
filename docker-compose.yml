@@ -1,6 +1,13 @@
 version: "3.8"
 
 services:
+  redis:
+    image: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6379:6379
+
   mock-api:
     build: ./mock-api
     volumes:
@@ -8,9 +15,35 @@ services:
     ports:
       - "8000:8000"
 
-  fetch-service:
+  fetch-service-1:
     build: ./fetch-service
     volumes:
       - ./fetch-service:/app
+    environment:
+      REDIS_URL: redis:6379
     ports:
       - "3000:3000"
+    depends_on:
+      - redis
+
+  fetch-service-2:
+    build: ./fetch-service
+    volumes:
+      - ./fetch-service:/app
+    environment:
+      REDIS_URL: redis:6379
+    ports:
+      - "3001:3000"
+    depends_on:
+      - redis
+
+  fetch-service-3:
+    build: ./fetch-service
+    volumes:
+      - ./fetch-service:/app
+    environment:
+      REDIS_URL: redis:6379
+    ports:
+      - "3002:3000"
+    depends_on:
+      - redis
