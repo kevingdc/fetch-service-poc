@@ -13,7 +13,18 @@ services:
     volumes:
       - ./mock-api:/app
     ports:
-      - "8000:8000"
+      - 8000:8000
+
+  queue-api:
+    build: ./queue-api
+    volumes:
+      - ./queue-api:/app
+    environment:
+      REDIS_URL: redis:6379
+    ports:
+      - 3000:3000
+    depends_on:
+      - redis
 
   fetch-service-1:
     build: ./fetch-service
@@ -21,10 +32,12 @@ services:
       - ./fetch-service:/app
     environment:
       REDIS_URL: redis:6379
-    ports:
-      - "3000:3000"
+      MOCK_API_URL: mock-api:8000
+      QUEUE_API_URL: queue-api:3000
     depends_on:
       - redis
+      - mock-api
+      - queue-api
 
   fetch-service-2:
     build: ./fetch-service
@@ -32,10 +45,12 @@ services:
       - ./fetch-service:/app
     environment:
       REDIS_URL: redis:6379
-    ports:
-      - "3001:3000"
+      MOCK_API_URL: mock-api:8000
+      QUEUE_API_URL: queue-api:3000
     depends_on:
       - redis
+      - mock-api
+      - queue-api
 
   fetch-service-3:
     build: ./fetch-service
@@ -43,7 +58,9 @@ services:
       - ./fetch-service:/app
     environment:
       REDIS_URL: redis:6379
-    ports:
-      - "3002:3000"
+      MOCK_API_URL: mock-api:8000
+      QUEUE_API_URL: queue-api:3000
     depends_on:
       - redis
+      - mock-api
+      - queue-api

@@ -1,18 +1,11 @@
-import express from "express";
-import { router } from "bull-board";
+import Bull from "bull";
 
-import influencer from "./routes/influencer";
+import influencerFetchProcess from "./src/influencer/influencer.process";
 
-const app = express();
-const port = 3000;
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-app.use("/admin/queues", router);
-
-app.use("/influencer", influencer);
-
-app.listen(port, () => {
-  console.log(`Fetch service listening at http://localhost:${port}.`);
+const influencerQueue = new Bull("influencer", {
+  redis: process.env.REDIS_URL,
 });
+
+influencerQueue.process(influencerFetchProcess);
+
+console.log(`Fetch service started.`);

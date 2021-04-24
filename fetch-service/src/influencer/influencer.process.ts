@@ -1,11 +1,13 @@
 import { Job } from "bull";
 
-import { queueInfluencer } from "./influencer.queue";
+import API from "./influencer.api";
 
 async function influencerFetchProcess(job: Job): Promise<void> {
   const { pk } = job.data;
-  // console.log(`Fetching data for pk ${pk}`);
-  queueInfluencer(pk);
+
+  const influencer = API.fetchInfluencer(pk);
+  // Send to other queue to process
+  API.addToQueue(pk);
 }
 
 export default influencerFetchProcess;
