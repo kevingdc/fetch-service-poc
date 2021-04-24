@@ -1,6 +1,5 @@
 import Bull from "bull";
 import { setQueues, BullAdapter } from "bull-board";
-import { exception } from "node:console";
 
 type ID = number;
 
