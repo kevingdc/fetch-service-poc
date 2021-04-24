@@ -1,10 +1,12 @@
 import Bull from "bull";
 import { setQueues, BullAdapter } from "bull-board";
+import { exception } from "node:console";
 
 type ID = number;
 
 class InfluencerQueue {
   private queue: Bull.Queue;
+  private interval: NodeJS.Timeout;
 
   constructor() {
     this.queue = new Bull("influencer", {
@@ -13,19 +15,42 @@ class InfluencerQueue {
 
     setQueues([new BullAdapter(this.queue)]);
 
-    this.queue.on("cleaned", (jobs, type) => {
-      console.log(`Cleaned ${jobs.length} ${type} jobs.`);
-    });
+    this.interval = setInterval(() => this.cleanCompleted(), 5000);
   }
 
   async queueInfluencer(pk: ID): Promise<boolean> {
-    this.queue.add({ pk });
-    return true;
+    try {
+      await this.queue.add({ pk });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async cleanCompleted(): Promise<boolean> {
+    try {
+      const completedCount = await this.queue.getCompletedCount();
+
+      if (completedCount > 0) {
+        console.log(`Completed ${completedCount} jobs in the last 5 seconds.`);
+        await this.queue.clean(5000, "completed");
+      }
+
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 
   async obliterateQueue(): Promise<boolean> {
-    await this.queue.obliterate({ force: true });
-    return true;
+    clearInterval(this.interval);
+    try {
+      await this.queue.obliterate({ force: true });
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
 
