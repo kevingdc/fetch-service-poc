@@ -64,3 +64,15 @@ services:
       - redis
       - mock-api
       - queue-api
+
+  average-compute-service:
+    build: ./average-compute-service
+    volumes:
+      - ./average-compute-service:/app
+    environment:
+      REDIS_URL: redis:6379
+      QUEUE_API_URL: queue-api:3000
+    depends_on:
+      - redis
+      - mock-api
+      - queue-api

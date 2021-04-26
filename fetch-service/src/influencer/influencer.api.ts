@@ -31,6 +31,16 @@ class APIModel {
     }
   }
 
+  async addToAverageQueue(pk: ID, followerCount: number): Promise<boolean> {
+    try {
+      await this.queueAPI.post("/compute-average", { pk, followerCount });
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
   async fetchInfluencer(pk: ID): Promise<Influencer | null> {
     try {
       const influencer = await this.mockAPI.get(`/${pk}`);

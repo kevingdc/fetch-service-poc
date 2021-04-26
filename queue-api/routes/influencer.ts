@@ -1,6 +1,7 @@
 import express from "express";
 
 import influencerQueue from "../src/influencer/influencer.queue";
+import averageComputeQueue from "../src/average-compute/average-compute.queue";
 
 const router = express.Router();
 
@@ -9,6 +10,14 @@ router.post("/", (req, res) => {
 
   influencerQueue
     .queueInfluencer(pk)
+    .then(() => res.send("Added pk to queue."));
+});
+
+router.post("/compute-average", (req, res) => {
+  const { pk, followerCount } = req.body;
+
+  averageComputeQueue
+    .queueInfluencer(pk, followerCount)
     .then(() => res.send("Added pk to queue."));
 });
 
@@ -23,6 +32,12 @@ router.post("/init", (req, res) => {
 
 router.put("/halt", (req, res) => {
   influencerQueue.obliterateQueue().then(() => res.send("Queue obliterated."));
+});
+
+router.put("/compute-average/halt", (req, res) => {
+  averageComputeQueue
+    .obliterateQueue()
+    .then(() => res.send("Queue obliterated."));
 });
 
 export default router;
